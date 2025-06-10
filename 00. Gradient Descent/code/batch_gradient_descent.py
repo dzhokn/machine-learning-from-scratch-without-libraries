@@ -1,0 +1,170 @@
+import matplotlib.pyplot as plt
+
+class BatchGradientDescent:
+    def __init__(self, X: list[list[float]], Y: list[list[float]], learn_rate: float, num_iterations: int):
+        self.X = X
+        self.Y = Y
+        self.w = [0] * len(X[0]) # Initialize the weights to 0. The number of weights is equal to the number of features.
+        self.b = 0 # Initialize the bias to 0.
+        self.learn_rate = learn_rate
+        self.num_iterations = num_iterations
+
+    def __calculate_multi_feature_y(self, x: list[float], w: list[float], b: float) -> list[float]:
+        '''
+        Calculate the predicted value for a single observation.
+
+        Args:
+            x -> list[float]    : list of features (x1, x2, ..., xn)
+            w -> list[float]    : list of weights (w1, w2, ..., wn)
+            b -> float          : bias
+
+        Returns:
+            y -> float          : predicted value for a single observation
+        '''
+        n = len(x) # Number of features
+        y = b
+        for k in range(n):
+            y += w[k] * x[k] # y = w1*x1 + w2*x2 + ... + wn*xn + b
+        return y
+
+    def __calculate_cost(self) -> float:
+        '''
+        Calculate the cost by comparing the predicted and actual values for all observations.
+
+        Args:
+            X -> list[list[float]]  : m rows of n features (x^1, x^2, ..., x^m)
+            Y -> list[list[float]]  : m rows of expected float values (y^1, y^2, ..., y^m)
+            w -> list[float]        : n weights (w1, w2, ..., wn)
+            b -> float              : bias
+
+        Returns:
+            cost -> float           : cost of the model
+        '''
+        m = len(self.Y) # Number of observations
+        cost = 0
+        for i in range(m): # For each observation
+            y_pred_i = self.__calculate_multi_feature_y(self.X[i], self.w, self.b) # Calculate the predicted value for the current observation
+            cost += (y_pred_i - self.Y[i]) ** 2 # Calculate the squared difference between the predicted and actual values
+        return cost / m # Normalize by the number of observations
+
+    def __calculate_dj_dw(self) -> list[float]:
+        '''
+        Calculate the derivative of the cost function with respect to each weight.
+
+        Args:
+            X -> list[list[float]]  : m rows of n features (x^1, x^2, ..., x^m)
+            Y -> list[list[float]]  : m rows of expected float values (y^1, y^2, ..., y^m)
+            w -> list[float]        : n weights (w1, w2, ..., wn)
+            b -> float              : bias
+
+        Returns:
+            dj_dw -> list[float]    : n weight derivatives (dj_dw1, dj_dw2, ..., dj_dwn)
+        '''
+        m = len(self.Y) # Number of observations
+        n = len(self.w) # Number of features
+        dj_dw = [0] * n # Initialize the derivative of the cost function with respect to the weights. n-sized list of zeros.
+
+        for i in range(m): # For each observation
+            y_pred_i = self.__calculate_multi_feature_y(self.X[i], self.w, self.b) # Calculate the predicted value for the current observation
+            cost_i = y_pred_i - self.Y[i] # Calculate the cost for the current observation
+            for j in range(n): # For each feature
+                dj_dw[j] += cost_i * self.X[i][j] # Calculate the derivative of the cost function with respect to the weights
+
+        for k in range(n): # For each feature
+            dj_dw[k] = 2/m * dj_dw[k] # Calculate the derivative of the cost function with respect to the weights
+
+        return dj_dw
+
+    def __calculate_dj_db(self) -> float:
+        '''
+        Calculate the derivative of the cost function with respect to the bias.
+
+        Args:
+            X -> list[list[float]]  : m rows of n features (x^1, x^2, ..., x^m)
+            Y -> list[list[float]]  : m rows of expected float values (y^1, y^2, ..., y^m)
+            w -> list[float]        : n weights (w1, w2, ..., wn)
+            b -> float              : bias
+
+        Returns:
+            dj_db -> float          : derivative of the cost function with respect to the bias
+        '''
+        m = len(self.Y) # Number of observations
+        dj_db = 0 # Initialize the derivative of the cost function with respect to the bias
+
+        for i in range(m): # For each observation
+            y_pred_i = self.__calculate_multi_feature_y(self.X[i], self.w, self.b) # Calculate the predicted value for the current observation
+            cost_i = y_pred_i - self.Y[i] # Calculate the cost for the current observation
+            dj_db += cost_i # Calculate the derivative of the cost function with respect to the bias
+
+        return 2/m * dj_db
+
+    def run(self) -> tuple[list[float], float]:
+        '''
+        Perform gradient descent to find the optimal weights and bias.
+
+        Args:
+            X -> list[list[float]]  : m rows of n features (x^1, x^2, ..., x^m)
+            Y -> list[list[float]]  : m rows of expected float values (y^1, y^2, ..., y^m)
+            w -> list[float]        : n weights (w1, w2, ..., wn)
+            b -> float              : bias
+            learn_rate -> float     : learning rate
+            num_iterations -> int   : number of iterations to perform
+
+        Returns:
+            w -> list[float]        : n weights (w1, w2, ..., wn)
+            b -> float              : bias
+        '''
+        for iteration_number in range(self.num_iterations):
+            dj_dw = self.__calculate_dj_dw() # Calculate the derivative of the cost function with respect to the weights
+            dj_db = self.__calculate_dj_db() # Calculate the derivative of the cost function with respect to the bias
+
+            # Update the weights and bias
+            self.w = [self.w[j] - self.learn_rate * dj_dw[j] for j in range(len(self.w))]
+            self.b = self.b - self.learn_rate * dj_db
+
+            # Print the cost every 100 iterations
+            if iteration_number % 100 == 0:
+                print(f"Iteration {iteration_number}: Cost = {self.__calculate_cost()}")
+        return self.w, self.b
+
+class Demo:
+    
+    def __prepare_data(self) -> tuple[list[list[float]], list[float]]:
+        # X1 = years of experience
+        X1 = [1.2, 1.3, 1.5, 1.8, 2, 2.1, 2.2, 2.5, 2.8, 2.9, 3.1, 3.3, 3.5, 3.8, 4, 4.1, 4.5, 4.9, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 10, 11, 12, 13, 14, 15]
+        # X2 = level of education 
+        X2 = [2, 5, 3, 5, 3, 4, 2, 3, 4, 4, 3, 7, 5, 6, 5, 5, 2, 3, 4, 5, 6, 7, 5, 3, 2, 4, 5, 7, 3, 5, 7, 7, 5]
+        # Y = salary
+        Y = [2900, 3300, 3100, 4200, 3500, 3800, 3300, 3500, 3750, 4000, 3900, 5300, 4420, 5000, 4900, 5200, 3900, 4800, 5700, 6500, 6930, 7500, 7360, 6970, 6800, 7500, 8000, 9500, 11000, 9500, 12300, 13700, 12500]
+        return X1, X2, Y
+
+    def __plot_results(self, X1: list[float], X2: list[float], Y: list[float], w: list[float], b: float):
+        Y_pred = []
+
+        for x1, x2 in zip(X1, X2):
+            Y_pred.append(b + w[0] * x1 + w[1] * x2)
+
+        plt.scatter(X1, Y, color='blue', label='Actual')
+        plt.plot(X1, Y_pred, color='red', label='Predicted')
+        plt.legend()
+        plt.show()
+
+    def run(self):
+        X1, X2, Y = self.__prepare_data()
+
+        # Merge the X1 and X2 into a single X
+        X = [[x1, x2] for x1, x2 in zip(X1, X2)]
+
+        learn_rate = 0.01   # learning rate (step size) - usually between 0.001 and 0.1
+        iterations = 5000   # number of iterations (epochs)
+
+        # Execute the gradient descent in search for optimal cost function (optimal `w` and `b`)
+        bgd = BatchGradientDescent(X, Y, learn_rate, iterations)
+        w, b = bgd.run()
+        print(f"Final `b` is {b} and `w` are {w}")
+
+        self.__plot_results(X1, X2, Y, w, b)
+
+if __name__ == "__main__":
+    demo = Demo()
+    demo.run()
