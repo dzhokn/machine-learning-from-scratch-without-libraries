@@ -1,7 +1,21 @@
 import matplotlib.pyplot as plt
 
 class BatchGradientDescent:
-    def __init__(self, X: list[list[float]], Y: list[list[float]], learn_rate: float, num_iterations: int):
+    '''
+    Batch Gradient Descent is a type of gradient descent that uses all the training examples at once to update the weights and bias.
+    '''
+
+    # Initialize the class with the data and the learning rate and the number of iterations
+    def __init__(self, X: list[list[float]], Y: list[float], learn_rate: float, num_iterations: int):
+        '''
+        Initialize the class with the data and the learning rate and the number of iterations
+
+        Args:
+            X -> list[list[float]]  : m rows of n features each (x^1, x^2, ..., x^m)
+            Y -> list[float]        : m rows of expected float values (y^1, y^2, ..., y^m)
+            learn_rate -> float     : learning rate
+            num_iterations -> int   : number of iterations to perform
+        '''
         self.X = X
         self.Y = Y
         self.w = [0] * len(X[0]) # Initialize the weights to 0. The number of weights is equal to the number of features.
@@ -31,12 +45,6 @@ class BatchGradientDescent:
         '''
         Calculate the cost by comparing the predicted and actual values for all observations.
 
-        Args:
-            X -> list[list[float]]  : m rows of n features (x^1, x^2, ..., x^m)
-            Y -> list[list[float]]  : m rows of expected float values (y^1, y^2, ..., y^m)
-            w -> list[float]        : n weights (w1, w2, ..., wn)
-            b -> float              : bias
-
         Returns:
             cost -> float           : cost of the model
         '''
@@ -50,12 +58,6 @@ class BatchGradientDescent:
     def __calculate_dj_dw(self) -> list[float]:
         '''
         Calculate the derivative of the cost function with respect to each weight.
-
-        Args:
-            X -> list[list[float]]  : m rows of n features (x^1, x^2, ..., x^m)
-            Y -> list[list[float]]  : m rows of expected float values (y^1, y^2, ..., y^m)
-            w -> list[float]        : n weights (w1, w2, ..., wn)
-            b -> float              : bias
 
         Returns:
             dj_dw -> list[float]    : n weight derivatives (dj_dw1, dj_dw2, ..., dj_dwn)
@@ -79,12 +81,6 @@ class BatchGradientDescent:
         '''
         Calculate the derivative of the cost function with respect to the bias.
 
-        Args:
-            X -> list[list[float]]  : m rows of n features (x^1, x^2, ..., x^m)
-            Y -> list[list[float]]  : m rows of expected float values (y^1, y^2, ..., y^m)
-            w -> list[float]        : n weights (w1, w2, ..., wn)
-            b -> float              : bias
-
         Returns:
             dj_db -> float          : derivative of the cost function with respect to the bias
         '''
@@ -101,14 +97,6 @@ class BatchGradientDescent:
     def run(self) -> tuple[list[float], float]:
         '''
         Perform gradient descent to find the optimal weights and bias.
-
-        Args:
-            X -> list[list[float]]  : m rows of n features (x^1, x^2, ..., x^m)
-            Y -> list[list[float]]  : m rows of expected float values (y^1, y^2, ..., y^m)
-            w -> list[float]        : n weights (w1, w2, ..., wn)
-            b -> float              : bias
-            learn_rate -> float     : learning rate
-            num_iterations -> int   : number of iterations to perform
 
         Returns:
             w -> list[float]        : n weights (w1, w2, ..., wn)
@@ -128,8 +116,19 @@ class BatchGradientDescent:
         return self.w, self.b
 
 class Demo:
-    
+    '''
+    Demo class to run the batch gradient descent algorithm.
+    '''
+
     def __prepare_data(self) -> tuple[list[list[float]], list[float]]:
+        '''
+        Prepare the data for the batch gradient descent algorithm.
+
+        Returns:
+            X1 -> list[float]    : years of experience
+            X2 -> list[float]    : level of education
+            Y -> list[float]     : salary
+        '''
         # X1 = years of experience
         X1 = [1.2, 1.3, 1.5, 1.8, 2, 2.1, 2.2, 2.5, 2.8, 2.9, 3.1, 3.3, 3.5, 3.8, 4, 4.1, 4.5, 4.9, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 10, 11, 12, 13, 14, 15]
         # X2 = level of education 
@@ -138,7 +137,20 @@ class Demo:
         Y = [2900, 3300, 3100, 4200, 3500, 3800, 3300, 3500, 3750, 4000, 3900, 5300, 4420, 5000, 4900, 5200, 3900, 4800, 5700, 6500, 6930, 7500, 7360, 6970, 6800, 7500, 8000, 9500, 11000, 9500, 12300, 13700, 12500]
         return X1, X2, Y
 
-    def __plot_results(self, X1: list[float], X2: list[float], Y: list[float], w: list[float], b: float):
+    def __plot_results(self, X1: list[float], X2: list[float], Y: list[float], w: list[float], b: float) -> None:
+        '''
+        Plot the results of the batch gradient descent algorithm.
+
+        Args:
+            X1 -> list[float]    : years of experience
+            X2 -> list[float]    : level of education
+            Y -> list[float]     : salary
+            w -> list[float]     : weights
+            b -> float           : bias
+
+        Returns:
+            None
+        '''
         Y_pred = []
 
         for x1, x2 in zip(X1, X2):
@@ -149,7 +161,13 @@ class Demo:
         plt.legend()
         plt.show()
 
-    def run(self):
+    def run(self) -> None:
+        '''
+        Run the batch gradient descent algorithm.
+
+        Returns:
+            None
+        '''
         X1, X2, Y = self.__prepare_data()
 
         # Merge the X1 and X2 into a single X
