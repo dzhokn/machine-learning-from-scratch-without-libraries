@@ -18,27 +18,25 @@ class BatchGradientDescent:
         '''
         self.X = X
         self.Y = Y
-        self.w = [0] * len(X[0]) # Initialize the weights to 0. The number of weights is equal to the number of features.
-        self.b = 0 # Initialize the bias to 0.
+        self.weights = [0] * len(X[0]) # Initialize the weights to 0. The number of weights is equal to the number of features.
+        self.bias = 0 # Initialize the bias to 0.
         self.learn_rate = learn_rate
         self.num_iterations = num_iterations
 
-    def __calculate_multi_feature_y(self, x: list[float], w: list[float], b: float) -> list[float]:
+    def __calculate_multi_feature_y(self, x: list[float]) -> list[float]:
         '''
         Calculate the predicted value for a single observation.
 
         Args:
             x -> list[float]    : list of features (x1, x2, ..., xn)
-            w -> list[float]    : list of weights (w1, w2, ..., wn)
-            b -> float          : bias
 
         Returns:
             y -> float          : predicted value for a single observation
         '''
         n = len(x) # Number of features
-        y = b
+        y = self.bias
         for k in range(n):
-            y += w[k] * x[k] # y = w1*x1 + w2*x2 + ... + wn*xn + b
+            y += self.weights[k] * x[k] # y = w1*x1 + w2*x2 + ... + wn*xn + b
         return y
 
     def __calculate_cost(self) -> float:
@@ -51,7 +49,7 @@ class BatchGradientDescent:
         m = len(self.Y) # Number of observations
         cost = 0
         for i in range(m): # For each observation
-            y_pred_i = self.__calculate_multi_feature_y(self.X[i], self.w, self.b) # Calculate the predicted value for the current observation
+            y_pred_i = self.__calculate_multi_feature_y(self.X[i]) # Calculate the predicted value for the current observation
             cost += (y_pred_i - self.Y[i]) ** 2 # Calculate the squared difference between the predicted and actual values
         return cost / m # Normalize by the number of observations
 
@@ -63,11 +61,11 @@ class BatchGradientDescent:
             dj_dw -> list[float]    : n weight derivatives (dj_dw1, dj_dw2, ..., dj_dwn)
         '''
         m = len(self.Y) # Number of observations
-        n = len(self.w) # Number of features
+        n = len(self.weights) # Number of features
         dj_dw = [0] * n # Initialize the derivative of the cost function with respect to the weights. n-sized list of zeros.
 
         for i in range(m): # For each observation
-            y_pred_i = self.__calculate_multi_feature_y(self.X[i], self.w, self.b) # Calculate the predicted value for the current observation
+            y_pred_i = self.__calculate_multi_feature_y(self.X[i]) # Calculate the predicted value for the current observation
             cost_i = y_pred_i - self.Y[i] # Calculate the cost for the current observation
             for j in range(n): # For each feature
                 dj_dw[j] += cost_i * self.X[i][j] # Calculate the derivative of the cost function with respect to the weights
@@ -88,7 +86,7 @@ class BatchGradientDescent:
         dj_db = 0 # Initialize the derivative of the cost function with respect to the bias
 
         for i in range(m): # For each observation
-            y_pred_i = self.__calculate_multi_feature_y(self.X[i], self.w, self.b) # Calculate the predicted value for the current observation
+            y_pred_i = self.__calculate_multi_feature_y(self.X[i]) # Calculate the predicted value for the current observation
             cost_i = y_pred_i - self.Y[i] # Calculate the cost for the current observation
             dj_db += cost_i # Calculate the derivative of the cost function with respect to the bias
 
@@ -99,21 +97,21 @@ class BatchGradientDescent:
         Perform gradient descent to find the optimal weights and bias.
 
         Returns:
-            w -> list[float]        : n weights (w1, w2, ..., wn)
-            b -> float              : bias
+            weights -> list[float]  : n weights (w1, w2, ..., wn)
+            bias -> float           : bias
         '''
         for iteration_number in range(self.num_iterations):
             dj_dw = self.__calculate_dj_dw() # Calculate the derivative of the cost function with respect to the weights
             dj_db = self.__calculate_dj_db() # Calculate the derivative of the cost function with respect to the bias
 
             # Update the weights and bias
-            self.w = [self.w[j] - self.learn_rate * dj_dw[j] for j in range(len(self.w))]
-            self.b = self.b - self.learn_rate * dj_db
+            self.weights = [self.weights[j] - self.learn_rate * dj_dw[j] for j in range(len(self.weights))]
+            self.bias = self.bias - self.learn_rate * dj_db
 
             # Print the cost every 100 iterations
             if iteration_number % 100 == 0:
                 print(f"Iteration {iteration_number}: Cost = {self.__calculate_cost()}")
-        return self.w, self.b
+        return self.weights, self.bias
 
 class Demo:
     '''
@@ -137,16 +135,16 @@ class Demo:
         Y = [2900, 3300, 3100, 4200, 3500, 3800, 3300, 3500, 3750, 4000, 3900, 5300, 4420, 5000, 4900, 5200, 3900, 4800, 5700, 6500, 6930, 7500, 7360, 6970, 6800, 7500, 8000, 9500, 11000, 9500, 12300, 13700, 12500]
         return X1, X2, Y
 
-    def __plot_results(self, X1: list[float], X2: list[float], Y: list[float], w: list[float], b: float) -> None:
+    def __plot_results(self, X1: list[float], X2: list[float], Y: list[float], weights: list[float], bias: float) -> None:
         '''
         Plot the results of the batch gradient descent algorithm.
 
         Args:
-            X1 -> list[float]    : years of experience
-            X2 -> list[float]    : level of education
-            Y -> list[float]     : salary
-            w -> list[float]     : weights
-            b -> float           : bias
+            X1 -> list[float]       : years of experience
+            X2 -> list[float]       : level of education
+            Y -> list[float]        : salary
+            weights -> list[float]  : weights
+            bias -> float           : bias
 
         Returns:
             None
@@ -154,10 +152,10 @@ class Demo:
         Y_pred = []
 
         for x1, x2 in zip(X1, X2):
-            Y_pred.append(b + w[0] * x1 + w[1] * x2)
+            Y_pred.append(bias + weights[0] * x1 + weights[1] * x2)
 
         plt.scatter(X1, Y, color='blue', label='Actual')
-        plt.plot(X1, Y_pred, color='red', label='Predicted')
+        plt.scatter(X1, Y_pred, color='red', label='Predicted')
         plt.legend()
         plt.show()
 
