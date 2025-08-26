@@ -1,3 +1,3 @@
 # Machine learning from scratch without libraries
 
-Backprop, NNs, Regression modesl, Classification models, etc. - all writtern from scratch without PyTorch or TensorFlow
+Backpropagation, Neural Networks, Regression models, Classification models, CNNs, SVM, Trees, Forests, etc. - all writtern from scratch without PyTorch or TensorFlow
