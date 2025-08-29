@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 class SimpleAutoencoder:
     '''
-    Simple Autoencoder. It is a type of unsupervised learning algorithm used to find the 
+    Simple Autoencoder. It is a type of unsupervised learning algorithm used to find the
     latent features of the data, by compressing it into a lower dimension.
     '''
 
@@ -17,7 +17,7 @@ class SimpleAutoencoder:
     def __init__(self, input_layer_size: int, hidden_layer_size: int, output_layer_size: int):
         '''
         Initialize the SimpleAutoencoder class. It will initialize the weights and biases.
-        
+
         Args:
             input_layer_size            : int
             hidden_layer_size           : int
@@ -50,7 +50,7 @@ class SimpleAutoencoder:
         '''Forward pass. It's the forward pass of the neural network.'''
         # Encoder (m, n) @ (n, hidden_size) = (m, hidden_size) + (hidden_size, 1) = (m, hidden_size)
         hidden = self.sigmoid(np.dot(X, self.weights[0]) + self.biases[0])
-        # Decoder (m, hidden_size) @ (hidden_size, n) = (m, n) + (n, 1) = (m, n)    
+        # Decoder (m, hidden_size) @ (hidden_size, n) = (m, n) + (n, 1) = (m, n)
         output = self.sigmoid(np.dot(hidden, self.weights[1]) + self.biases[1])
         return hidden, output
 
@@ -113,7 +113,7 @@ class Demo:
         students['study_hours'] = students['study_hours'].apply(lambda x: x/5)
 
         return students.to_numpy()
-    
+
     def run(self):
         '''Run the demo.'''
         X = self.load_data()
