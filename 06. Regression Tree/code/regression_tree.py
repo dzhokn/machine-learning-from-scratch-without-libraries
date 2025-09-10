@@ -60,7 +60,7 @@ class RegressionTree():
         num_samples, num_features = np.shape(X)
         best_split = {}
 
-        # Split until stopping conditions are met:
+        # Split until stopping conditions are met (pre-pruning criteria):
         # 1. Minimum number of samples to split an internal node
         # 2. Maximum depth of the tree
         if num_samples >= self.min_samples_split and curr_depth <= self.max_depth:
@@ -276,9 +276,17 @@ def train_test_split(
     X: np.ndarray, 
     Y: np.ndarray, 
     test_size: float = 0.2) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """
+    '''
     Split the dataset into training and testing sets.
-    """
+
+    Args:
+        X (np.ndarray): The input features.
+        Y (np.ndarray): The target variable.
+        test_size (float): The size of the test set.
+
+    Returns:
+        tuple[pd.DataFrame, pd.DataFrame]: The training and testing sets.
+    '''
     # Shuffle the dataset
     df = pd.DataFrame({'x1': X[:, 0], 'x2': X[:, 1], 'y': Y})
     df = df.sample(frac=1).reset_index(drop=True)
