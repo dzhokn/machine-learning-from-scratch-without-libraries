@@ -5,4 +5,4 @@ Backpropagation, Neural Networks, Regression models, Classification models, CNNs
 
 Altough, I am briefly covering the theory (and mathematics) behind each of the models, it is required for the reader to already have some basic knowledge in machine learning and the models in question.
 
-![Machine Learning Roadmap](ml_roadmap_copy.png)
+![Machine Learning Roadmap](ml_roadmap.png)
