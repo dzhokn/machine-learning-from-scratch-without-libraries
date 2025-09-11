@@ -46,7 +46,7 @@ class RegressionTree():
 
     def build_tree(self, dataset: np.ndarray, curr_depth: int = 0) -> Node:
         '''
-        Build the decision tree recursively.
+        Recrusively build the decision tree.
 
         Args:
             dataset (np.ndarray):   The dataset to build the tree on.
@@ -65,35 +65,32 @@ class RegressionTree():
         # 2. Maximum depth of the tree
         if num_samples >= self.min_samples_split and curr_depth <= self.max_depth:
             # find the best split
-            best_split = self.get_best_split(dataset, num_samples, num_features)
+            best_split = self.get_best_split(dataset, num_features)
             # check if information gain is positive
             if best_split["var_red"] > 0:
                 # Recursively build the left subtree
                 left_subtree = self.build_tree(best_split["dataset_left"], curr_depth+1)
                 # Recursively build the right subtree
                 right_subtree = self.build_tree(best_split["dataset_right"], curr_depth+1)
-                # Return the new decision node (root node for the new subtree)
+                # CASE 1: Return a new decision node (root node for the two new subtrees)
                 return Node(best_split["feature_index"],
                             best_split["threshold"],
                             best_split["var_red"],
                             left_subtree, 
                             right_subtree)
         
-        # Otherwise, compute leaf node
+        # CASE 2: Otherwise, compute and return a leaf node.
         leaf_value = self.calculate_leaf_value(Y)
-        # Return the leaf node
         return Node(value=leaf_value)
 
-    def get_best_split(self, 
-            dataset: np.ndarray, 
-            num_samples: int, 
-            num_features: int) -> dict:
+    def get_best_split(self, dataset: np.ndarray, num_features: int) -> dict:
         ''' 
-        Find the best split for the dataset.
+        Find the best split for the dataset. This happens by building a candidate split for each feature and each value of this feature.
+        So the complexity of this method is O(m x u), where m is the number of features and u is the avg number of unique values within a feature.
+        Wa rank the candidate splits by `information gain` (variance reduction) and always pick the one with highest `information gain`.
         
         Args:
             dataset (np.ndarray):   The dataset to find the best split on.
-            num_samples (int):      The number of samples in the dataset.
             num_features (int):     The number of features in the dataset.
 
         Returns:
@@ -200,7 +197,7 @@ class RegressionTree():
         # CASE 3: We are at internal node level
         else:
             var_red_str = f"{tree.var_red:.0f}"
-            print("X_"+str(tree.feature_index), "<=", tree.threshold, "?", var_red_str)
+            print("X_"+str(tree.feature_index), "<=", tree.threshold, "? Info Gain: ", var_red_str)
             print("%sleft:" % (indent), end="")
             self.print_tree(tree.left, indent + indent)
             print("%sright:" % (indent), end="")
