@@ -1,12 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from DataLoader import DataLoader
+from data.DataLoader import DataLoader
 from layer.Convolutional import Convolutional
 from layer.Activation import Sigmoid
 from layer.Reshape import Reshape
 from layer.Dense import Dense
 from utils.Loss import Loss
+
 class CnnDemo:
 
     @staticmethod
