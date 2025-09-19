@@ -39,3 +39,20 @@ class Sigmoid(Activation):
 
         # Call the parent class constructor to initialize the activation and activation_derivative
         super().__init__(sigmoid, sigmoid_derivative)
+
+class Relu(Activation):
+    def __init__(self):
+        def relu(x: np.ndarray) -> np.ndarray:
+            """
+            Calculate the ReLU of a given input.
+            """
+            return np.maximum(0, x)
+
+        def relu_derivative(x: np.ndarray) -> np.ndarray:
+            """
+            Calculate the derivative of the ReLU of a given input.
+            """
+            return np.where(x > 0, 1, 0)
+
+        # Call the parent class constructor to initialize the activation and activation_derivative
+        super().__init__(relu, relu_derivative)
