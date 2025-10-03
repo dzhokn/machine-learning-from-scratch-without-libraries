@@ -11,7 +11,7 @@ class Signal:
         """
         Convolve the image with the kernel.
         """
-        # Flip the kernel (after that it's a simple correlation)
+        # Flip the kernel, then do a simple correlation
         kernel = np.flip(kernel)
         return Signal.correlate2d(image, kernel, mode)
 
